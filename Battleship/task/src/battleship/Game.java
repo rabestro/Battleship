@@ -29,18 +29,31 @@ public class Game implements Runnable {
     }
 
     private void startGame() {
+
         System.out.println("The game starts!");
         System.out.println(battleField.getField(true));
         System.out.println("Take a shot!");
 
-        final int index = getIndex();
-        final var isHit = battleField.getCell(index) == CellType.SHIP;
-        battleField.setCell(index, isHit ? CellType.HIT : CellType.MISS);
+        boolean isAllSunk;
+        do {
+            final int index = getIndex();
+            final var isHit = battleField.getCell(index) == CellType.SHIP;
+            final var isSunk = isHit && battleField.getShip(index).orElseThrow().isSunk();
+            isAllSunk = isSunk && battleField.isAllSunk();
 
-        System.out.println(battleField.getField(true));
-        System.out.println(isHit ? "You hit a ship!" : "You missed!");
-        System.out.println(battleField);
-}
+            battleField.setCell(index, isHit ? CellType.HIT : CellType.MISS);
+            System.out.println(battleField.getField(true));
+
+            System.out.println(isHit ? isSunk ? isAllSunk ?
+                    "You sank the last ship. You won. Congratulations!" :
+                    "You sunk a ship! Specify a new target:" :
+                    "You hit a ship! Try again:" :
+                    "You missed. Try again:");
+
+        } while (!isAllSunk);
+
+        System.out.println("Bye!");
+    }
 
     private int getIndex() {
         while (true) {

@@ -3,6 +3,7 @@ package battleship.domain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class BattleField {
     }
 
     public boolean addShip(ShipType type, int bow, boolean isHorizontal) {
-        final var ship = new Ship(type, i -> bow + (isHorizontal ? i : WIDTH * i));
+        final var ship = new Ship(type, i -> isHorizontal ? bow + i : bow + WIDTH * i);
         final var isOk = ship.getIndexes().allMatch(this::isOpen);
         if (isOk) {
             ship.getIndexes().forEach(this::setShip);
@@ -66,6 +67,14 @@ public class BattleField {
         return field[index];
     }
 
+    public Optional<Ship> getShip(int index) {
+        return ships.stream().filter(ship -> ship.getIndexes().anyMatch(i -> i == index)).findAny();
+    }
+
+    public boolean isAllSunk() {
+        return ships.stream().allMatch(Ship::isSunk);
+    }
+
     @Override
     public String toString() {
         return getField(false);
@@ -86,8 +95,13 @@ public class BattleField {
             this.type = type;
             this.getIndex = getIndex;
         }
+
         public IntStream getIndexes() {
             return range(0, type.getLength()).map(getIndex);
+        }
+
+        public boolean isSunk() {
+            return getIndexes().allMatch(i -> field[i] == CellType.HIT);
         }
     }
 }
