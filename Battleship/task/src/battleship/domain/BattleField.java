@@ -63,6 +63,10 @@ public class BattleField {
         return WIDTH * (coordinates.charAt(0) - 'A') + Integer.parseInt(coordinates.substring(1)) - 1;
     }
 
+    public boolean isHit(int index) {
+        return field[index] == CellType.SHIP || field[index] == CellType.HIT;
+    }
+
     public CellType getCell(int index) {
         return field[index];
     }

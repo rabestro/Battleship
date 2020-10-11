@@ -37,12 +37,12 @@ public class Game implements Runnable {
         boolean isAllSunk;
         do {
             final int index = getIndex();
-            final var isHit = battleField.getCell(index) == CellType.SHIP;
-            final var isSunk = isHit && battleField.getShip(index).orElseThrow().isSunk();
-            isAllSunk = isSunk && battleField.isAllSunk();
-
+            final var isHit = battleField.isHit(index);
             battleField.setCell(index, isHit ? CellType.HIT : CellType.MISS);
             System.out.println(battleField.getField(true));
+
+            final var isSunk = isHit && battleField.getShip(index).orElseThrow().isSunk();
+            isAllSunk = isSunk && battleField.isAllSunk();
 
             System.out.println(isHit ? isSunk ? isAllSunk ?
                     "You sank the last ship. You won. Congratulations!" :
