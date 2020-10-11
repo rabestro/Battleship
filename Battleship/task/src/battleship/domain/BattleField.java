@@ -67,16 +67,12 @@ public class BattleField {
         return field[index] == CellType.SHIP || field[index] == CellType.HIT;
     }
 
-    public CellType getCell(int index) {
-        return field[index];
-    }
-
     public Optional<Ship> getShip(int index) {
         return ships.stream().filter(ship -> ship.getIndexes().anyMatch(i -> i == index)).findAny();
     }
 
-    public boolean isAllSunk() {
-        return ships.stream().allMatch(Ship::isSunk);
+    public boolean isAllSank() {
+        return ships.stream().allMatch(Ship::isSank);
     }
 
     @Override
@@ -104,7 +100,7 @@ public class BattleField {
             return range(0, type.getLength()).map(getIndex);
         }
 
-        public boolean isSunk() {
+        public boolean isSank() {
             return getIndexes().allMatch(i -> field[i] == CellType.HIT);
         }
     }

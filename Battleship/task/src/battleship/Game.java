@@ -34,23 +34,23 @@ public class Game implements Runnable {
         System.out.println(battleField.getField(true));
         System.out.println("Take a shot!");
 
-        boolean isAllSunk;
+        boolean isAllSank;
         do {
             final int index = getIndex();
             final var isHit = battleField.isHit(index);
             battleField.setCell(index, isHit ? CellType.HIT : CellType.MISS);
             System.out.println(battleField.getField(true));
 
-            final var isSunk = isHit && battleField.getShip(index).orElseThrow().isSunk();
-            isAllSunk = isSunk && battleField.isAllSunk();
+            final var isSank = isHit && battleField.getShip(index).orElseThrow().isSank();
+            isAllSank = isSank && battleField.isAllSank();
 
-            System.out.println(isHit ? isSunk ? isAllSunk ?
+            System.out.println(isHit ? isSank ? isAllSank ?
                     "You sank the last ship. You won. Congratulations!" :
-                    "You sunk a ship! Specify a new target:" :
+                    "You sank a ship! Specify a new target:" :
                     "You hit a ship! Try again:" :
                     "You missed. Try again:");
 
-        } while (!isAllSunk);
+        } while (!isAllSank);
 
         System.out.println("Bye!");
     }
