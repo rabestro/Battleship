@@ -2,8 +2,9 @@ package battleship;
 
 import battleship.domain.BattleField;
 import battleship.domain.CellType;
+import battleship.domain.Coordinates;
 import battleship.domain.ShipType;
-import battleship.services.ManualShipAdjuster;
+import battleship.services.ManualShipArranger;
 
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -26,7 +27,7 @@ public class Game implements Runnable {
     }
 
     private void placeShips() {
-        final var adjuster = new ManualShipAdjuster();
+        final var adjuster = new ManualShipArranger();
 
         System.out.println("Player 1, place your ships on the game field");
         fieldOne = adjuster.placeShips(SHIPS_SET);
@@ -44,15 +45,17 @@ public class Game implements Runnable {
 
     private void startGame() {
         System.out.println("The game starts!");
-        System.out.println(fieldOne.getField(true));
+        System.out.println(fieldTwo.getFoggy());
+        System.out.println("---------------------");
+        System.out.println(fieldOne);
         System.out.println("Take a shot!");
 
         boolean isAllSank;
         do {
-            final int index = getIndex();
+            final int index = getCoordinates().getIndex();
             final var isHit = fieldOne.isHit(index);
             fieldOne.setCell(index, isHit ? CellType.HIT : CellType.MISS);
-            System.out.println(fieldOne.getField(true));
+            System.out.println(fieldOne.getFoggy());
 
             final var isSank = isHit && fieldOne.getShip(index).orElseThrow().isSank();
             isAllSank = isSank && fieldOne.isAllSank();
@@ -68,11 +71,11 @@ public class Game implements Runnable {
         System.out.println("Bye!");
     }
 
-    private int getIndex() {
+    private Coordinates getCoordinates() {
         while (true) {
             final var input = scanner.nextLine().toUpperCase();
-            if (PATTERN_CELL.matcher(input).matches()) {
-                return BattleField.getIndex(input);
+            if (Coordinates.isCorrect(input)) {
+                return new Coordinates(input);
             }
             System.out.println("Error! You entered the wrong coordinates! Try again:");
         }

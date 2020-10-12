@@ -18,7 +18,7 @@ public enum ShipType {
         this.name = name;
     }
 
-    public int getLength() {
+    public int length() {
         return length;
     }
 

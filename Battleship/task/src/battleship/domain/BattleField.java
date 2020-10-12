@@ -54,10 +54,6 @@ public class BattleField {
                 .allMatch(e -> field[index + e.getValue()] == CellType.EMPTY);
     }
 
-    public static int getIndex(String coordinate) {
-        return WIDTH * (coordinate.charAt(0) - 'A') + Integer.parseInt(coordinate.substring(1)) - 1;
-    }
-
     public boolean isHit(int index) {
         return field[index] == CellType.SHIP || field[index] == CellType.HIT;
     }
@@ -75,7 +71,11 @@ public class BattleField {
         return getField(false);
     }
 
-    public String getField(boolean isFog) {
+    public String getFoggy() {
+        return getField(true);
+    }
+
+    private String getField(boolean isFog) {
         return "  1 2 3 4 5 6 7 8 9 10" + range(0, field.length)
                 .mapToObj(i -> String.format(i % 10 > 0 ? " %2$c" : "%n%c %c", 'A' + i / 10,
                         isFog && field[i] == CellType.SHIP ? CellType.EMPTY.getSymbol() : field[i].getSymbol()))
@@ -92,7 +92,7 @@ public class BattleField {
         }
 
         public IntStream getIndexes() {
-            return range(0, type.getLength()).map(getIndex);
+            return range(0, type.length()).map(getIndex);
         }
 
         public boolean isSank() {

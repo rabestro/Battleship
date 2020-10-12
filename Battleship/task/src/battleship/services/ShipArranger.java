@@ -4,6 +4,6 @@ import battleship.domain.BattleField;
 import battleship.domain.ShipType;
 
 @FunctionalInterface
-public interface ShipAdjuster {
+public interface ShipArranger {
     BattleField placeShips(ShipType[] ships);
 }
