@@ -13,18 +13,18 @@ import static java.util.Arrays.fill;
 import static java.util.stream.IntStream.range;
 
 public class BattleField {
-    private static final int WIDTH = 10;
-    private static final int HEIGHT = 10;
+    public static final int WIDTH = 10;
+    public static final int HEIGHT = 10;
     private static final Map<IntPredicate, Integer> CHECK_CELLS = Map.of(
             i -> true, 0,
-            i -> i / 10 > 0 && i % 10 > 0, -11,
-            i -> i / 10 > 0, -10,
-            i -> i / 10 > 0 && i % 10 < 9, -9,
-            i -> i % 10 > 0, -1,
-            i -> i % 10 < 9, 1,
-            i -> i / 10 < 9 && i % 10 > 0, 9,
-            i -> i / 10 < 9, 10,
-            i -> i / 10 < 9 && i % 10 < 9, 11);
+            i -> i / WIDTH > 0 && i % WIDTH > 0, -WIDTH - 1,
+            i -> i / WIDTH > 0, -WIDTH,
+            i -> i / WIDTH > 0 && i % WIDTH < WIDTH - 1, -WIDTH + 1,
+            i -> i % WIDTH > 0, -1,
+            i -> i % WIDTH < WIDTH - 1, 1,
+            i -> i / WIDTH < WIDTH - 1 && i % WIDTH > 0, WIDTH - 1,
+            i -> i / WIDTH < WIDTH - 1, WIDTH,
+            i -> i / WIDTH < WIDTH - 1 && i % WIDTH < WIDTH - 1, WIDTH + 1);
 
     private final CellType[] field;
     private final List<Ship> ships;
@@ -35,32 +35,27 @@ public class BattleField {
         ships = new ArrayList<>();
     }
 
-    public boolean addShip(ShipType type, int bow, boolean isHorizontal) {
-        final var ship = new Ship(type, i -> isHorizontal ? bow + i : bow + WIDTH * i);
-        final var isOk = ship.getIndexes().allMatch(this::isOpen);
-        if (isOk) {
-            ship.getIndexes().forEach(this::setShip);
-            ships.add(ship);
-        }
-        return isOk;
+    public boolean isShipFit(Ship ship) {
+        return ship.getIndexes().allMatch(this::isShipCanPlaced);
+    }
+
+    public void addShip(Ship ship) {
+        ship.getIndexes().forEach(i -> field[i] = CellType.SHIP);
+        ships.add(ship);
     }
 
     public void setCell(int index, CellType type) {
         field[index] = type;
     }
 
-    private void setShip(int index) {
-        field[index] = CellType.SHIP;
-    }
-
-    private boolean isOpen(int index) {
+    private boolean isShipCanPlaced(int index) {
         return CHECK_CELLS.entrySet().stream()
                 .filter(e -> e.getKey().test(index))
                 .allMatch(e -> field[index + e.getValue()] == CellType.EMPTY);
     }
 
-    public static int getIndex(String coordinates) {
-        return WIDTH * (coordinates.charAt(0) - 'A') + Integer.parseInt(coordinates.substring(1)) - 1;
+    public static int getIndex(String coordinate) {
+        return WIDTH * (coordinate.charAt(0) - 'A') + Integer.parseInt(coordinate.substring(1)) - 1;
     }
 
     public boolean isHit(int index) {

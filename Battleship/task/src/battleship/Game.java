@@ -16,29 +16,46 @@ public class Game implements Runnable {
     private static final ShipType[] SHIPS_SET = new ShipType[]
             {AIRCRAFT_CARRIER, BATTLESHIP, SUBMARINE, CRUISER, DESTROYER};
 
-    private BattleField battleField;
+    private BattleField fieldOne;
+    private BattleField fieldTwo;
 
     @Override
     public void run() {
-        final var adjuster = new ManualShipAdjuster();
-        battleField = adjuster.placeShips(SHIPS_SET);
+        placeShips();
         startGame();
+    }
+
+    private void placeShips() {
+        final var adjuster = new ManualShipAdjuster();
+
+        System.out.println("Player 1, place your ships on the game field");
+        fieldOne = adjuster.placeShips(SHIPS_SET);
+        switchPlayer();
+        System.out.println("Player 2, place your ships on the game field");
+        fieldTwo = adjuster.placeShips(SHIPS_SET);
+        switchPlayer();
+    }
+
+    private void switchPlayer() {
+        System.out.println("Press Enter and pass the move to another player");
+        scanner.nextLine();
+        // clear screen
     }
 
     private void startGame() {
         System.out.println("The game starts!");
-        System.out.println(battleField.getField(true));
+        System.out.println(fieldOne.getField(true));
         System.out.println("Take a shot!");
 
         boolean isAllSank;
         do {
             final int index = getIndex();
-            final var isHit = battleField.isHit(index);
-            battleField.setCell(index, isHit ? CellType.HIT : CellType.MISS);
-            System.out.println(battleField.getField(true));
+            final var isHit = fieldOne.isHit(index);
+            fieldOne.setCell(index, isHit ? CellType.HIT : CellType.MISS);
+            System.out.println(fieldOne.getField(true));
 
-            final var isSank = isHit && battleField.getShip(index).orElseThrow().isSank();
-            isAllSank = isSank && battleField.isAllSank();
+            final var isSank = isHit && fieldOne.getShip(index).orElseThrow().isSank();
+            isAllSank = isSank && fieldOne.isAllSank();
 
             System.out.println(isHit ? isSank ? isAllSank ?
                     "You sank the last ship. You won. Congratulations!" :

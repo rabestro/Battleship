@@ -4,6 +4,7 @@ import battleship.domain.BattleField;
 import battleship.domain.ShipType;
 
 import java.util.Scanner;
+import java.util.function.IntUnaryOperator;
 import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
@@ -15,39 +16,43 @@ public class ManualShipAdjuster implements ShipAdjuster {
     private static final Pattern PATTERN_COORDINATES =
             Pattern.compile("([A-J])([1-9]|10) \\1([1-9]|10)|[A-J]([1-9]|10) [A-J]\\4");
 
-    private final BattleField battleField;
+    private BattleField battleField;
 
     public ManualShipAdjuster() {
-        this.battleField = new BattleField();
     }
 
     @Override
     public BattleField placeShips(ShipType[] ships) {
+        battleField = new BattleField();
         stream(ships).forEach(this::placeShip);
         System.out.println(battleField);
         return battleField;
     }
 
-    private void placeShip(ShipType ship) {
-        boolean isAdded = false;
+    private void placeShip(ShipType shipType) {
         System.out.println(battleField);
-        do {
-            System.out.println("Enter the coordinates of the " + ship + " (" + ship.getLength() + " cells):");
+        while (true) {
+            System.out.println("Enter the coordinates of the " + shipType + " (" + shipType.getLength() + " cells):");
             final var coordinates = getCoordinates();
             final var isHorizontal = coordinates[0].charAt(0) == coordinates[1].charAt(0);
             final var length = isHorizontal
                     ? parseInt(coordinates[1].substring(1)) - parseInt(coordinates[0].substring(1))
                     : coordinates[1].charAt(0) - coordinates[0].charAt(0);
-            if (abs(length) != ship.getLength() - 1) {
-                System.out.println("Error! Wrong length of the " + ship + "! Try again:");
+            if (abs(length) != shipType.getLength() - 1) {
+                System.out.println("Error! Wrong length of the " + shipType + "! Try again:");
                 continue;
             }
-            final var bowIndex = BattleField.getIndex(coordinates[length > 0 ? 0 : 1]);
-            isAdded = battleField.addShip(ship, bowIndex, isHorizontal);
-            if (!isAdded) {
-                System.out.println("Error! You placed it too close to another one. Try again:");
+            final var bow = BattleField.getIndex(coordinates[length > 0 ? 0 : 1]);
+            final IntUnaryOperator getShipIndex = i -> isHorizontal ? bow + i : bow + BattleField.WIDTH * i;
+
+            final var ship = battleField.new Ship(shipType, getShipIndex);
+
+            if (battleField.isShipFit(ship)) {
+                battleField.addShip(ship);
+                return;
             }
-        } while (!isAdded);
+            System.out.println("Error! You placed it too close to another one. Try again:");
+        }
     }
 
     private String[] getCoordinates() {
