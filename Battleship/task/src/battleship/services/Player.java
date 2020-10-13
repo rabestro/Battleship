@@ -1,7 +1,6 @@
 package battleship.services;
 
 import battleship.domain.BattleField;
-import battleship.domain.FoggedField;
 import battleship.domain.ShipType;
 import battleship.domain.ShotStatus;
 
@@ -20,15 +19,11 @@ public abstract class Player {
         this.foe = foe;
     }
 
-    public FoggedField getFoggedField() {
-        return new FoggedField(battleField);
+    public String getFoggedField() {
+        return battleField.getFoggy();
     }
 
-    public abstract int getShotIndex();
-
-    public Player getFoe() {
-        return foe;
-    }
+    public abstract ShotStatus makeShot();
 
     public ShotStatus shot(int index) {
         return battleField.shot(index);

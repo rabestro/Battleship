@@ -1,5 +1,6 @@
 package battleship.domain;
 
+import java.util.function.IntUnaryOperator;
 import java.util.regex.Pattern;
 
 import static java.text.MessageFormat.format;
@@ -12,6 +13,11 @@ public class Coordinates {
 
     private final int row;
     private final int col;
+
+    public Coordinates(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
 
     public Coordinates(String coordinates) {
         row = coordinates.charAt(0) - 'A';
@@ -28,6 +34,10 @@ public class Coordinates {
 
     public int getIndex() {
         return BattleField.WIDTH * row + col;
+    }
+
+    public IntUnaryOperator getIndexes(boolean isHorizontal) {
+        return i -> isHorizontal ? getIndex() + i : getIndex() + BattleField.WIDTH * i;
     }
 
     public static boolean isValid(String coordinates) {

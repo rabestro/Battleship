@@ -35,10 +35,6 @@ public class BattleField {
         ships = new ArrayList<>();
     }
 
-    public boolean isShipFit(Ship ship) {
-        return ship.getIndexes().allMatch(this::isShipCanPlaced);
-    }
-
     public void addShip(Ship ship) {
         ship.getIndexes().forEach(i -> field[i] = CellType.SHIP);
         ships.add(ship);
@@ -93,6 +89,10 @@ public class BattleField {
         public Ship(ShipType type, IntUnaryOperator getIndex) {
             this.type = type;
             this.getIndex = getIndex;
+        }
+
+        public boolean isFit() {
+            return getIndexes().allMatch(BattleField.this::isShipCanPlaced);
         }
 
         public IntStream getIndexes() {

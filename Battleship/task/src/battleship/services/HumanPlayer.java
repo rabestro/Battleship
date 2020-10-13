@@ -2,6 +2,7 @@ package battleship.services;
 
 import battleship.domain.Coordinates;
 import battleship.domain.ShipType;
+import battleship.domain.ShotStatus;
 
 import java.util.Scanner;
 
@@ -20,12 +21,12 @@ public class HumanPlayer extends Player {
     }
 
     @Override
-    public int getShotIndex() {
+    public ShotStatus makeShot() {
         System.out.println(foe.getFoggedField());
         System.out.println("---------------------");
         System.out.println(battleField);
         System.out.println(name + ", it's your turn:");
-        return getCoordinates().getIndex();
+        return foe.shot(getCoordinates().getIndex());
     }
 
     private Coordinates getCoordinates() {

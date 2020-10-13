@@ -35,7 +35,7 @@ public class ManualShipArranger implements ShipArranger {
 
             final var ship = battleField.new Ship(shipType, shipCoordinates.getIndexes());
 
-            if (battleField.isShipFit(ship)) {
+            if (ship.isFit()) {
                 battleField.addShip(ship);
                 return;
             }
