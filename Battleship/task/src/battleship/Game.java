@@ -11,6 +11,7 @@ import java.util.Scanner;
 import java.util.stream.IntStream;
 
 import static battleship.domain.ShipType.*;
+import static java.util.stream.IntStream.range;
 
 public class Game implements Runnable {
     private static final Scanner scanner = new Scanner(System.in);
@@ -18,8 +19,6 @@ public class Game implements Runnable {
             {AIRCRAFT_CARRIER, BATTLESHIP, SUBMARINE, CRUISER, DESTROYER};
     private static final ShipArranger SHIP_ARRANGER = new ManualShipArranger();
 
-    private BattleField fieldOne;
-    private BattleField fieldTwo;
     private BattleField[] fields = new BattleField[2];
     private String[] playerName = new String[]{"Player 1", "Player 2"};
     private int currentPlayer = 0;
@@ -33,15 +32,19 @@ public class Game implements Runnable {
     }
 
     private void placeShips() {
-            System.out.println(playerName[currentPlayer] + ", place your ships on the game field");
-            fields[currentPlayer] = SHIP_ARRANGER.placeShips(SHIPS_SET);
+        System.out.println(playerName[currentPlayer] + ", place your ships on the game field");
+        fields[currentPlayer] = SHIP_ARRANGER.placeShips(SHIPS_SET);
     }
 
     private void switchPlayer() {
         currentPlayer = 1 - currentPlayer;
         System.out.println("Press Enter and pass the move to " + playerName[currentPlayer]);
         scanner.nextLine();
-        // clear screen
+        clearScreen();
+    }
+
+    private void clearScreen() {
+        range(0, 15).forEach(System.out::println);
     }
 
     private void startGame() {
