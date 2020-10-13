@@ -30,7 +30,7 @@ public class Coordinates {
         return BattleField.WIDTH * row + col;
     }
 
-    public static boolean isCorrect(String coordinates) {
+    public static boolean isValid(String coordinates) {
         return PATTERN_COORDINATE.matcher(coordinates).matches();
     }
 

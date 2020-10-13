@@ -62,7 +62,7 @@ public class Game implements Runnable {
     private Coordinates getCoordinates() {
         while (true) {
             final var input = scanner.nextLine().toUpperCase();
-            if (Coordinates.isCorrect(input)) {
+            if (Coordinates.isValid(input)) {
                 return new Coordinates(input);
             }
             System.out.println("Error! You entered the wrong coordinates! Try again:");
