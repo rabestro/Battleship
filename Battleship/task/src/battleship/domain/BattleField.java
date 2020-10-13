@@ -44,18 +44,22 @@ public class BattleField {
         ships.add(ship);
     }
 
-    public void setCell(int index, CellType type) {
-        field[index] = type;
-    }
-
     private boolean isShipCanPlaced(int index) {
         return CHECK_CELLS.entrySet().stream()
                 .filter(e -> e.getKey().test(index))
                 .allMatch(e -> field[index + e.getValue()] == CellType.EMPTY);
     }
 
-    public boolean isHit(int index) {
-        return field[index] == CellType.SHIP || field[index] == CellType.HIT;
+    public ShotStatus shot(int index) {
+        final var isMiss = field[index] == CellType.EMPTY || field[index] == CellType.MISS;
+        field[index] = isMiss ? CellType.MISS : CellType.HIT;
+        if (isMiss) {
+            return ShotStatus.MISS;
+        }
+        if (getShip(index).orElseThrow().isSank()) {
+            return isAllSank() ? ShotStatus.ALL : ShotStatus.SUNK;
+        }
+        return ShotStatus.HIT;
     }
 
     public Optional<Ship> getShip(int index) {

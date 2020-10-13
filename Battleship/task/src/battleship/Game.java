@@ -1,18 +1,16 @@
 package battleship;
 
 import battleship.domain.BattleField;
-import battleship.domain.CellType;
 import battleship.domain.Coordinates;
 import battleship.domain.ShipType;
+import battleship.domain.ShotStatus;
 import battleship.services.ManualShipArranger;
 
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 import static battleship.domain.ShipType.*;
 
 public class Game implements Runnable {
-    private static final Pattern PATTERN_CELL = Pattern.compile("[A-J]([1-9]|10)");
     private static final Scanner scanner = new Scanner(System.in);
     private static final ShipType[] SHIPS_SET = new ShipType[]
             {AIRCRAFT_CARRIER, BATTLESHIP, SUBMARINE, CRUISER, DESTROYER};
@@ -50,23 +48,13 @@ public class Game implements Runnable {
         System.out.println(fieldOne);
         System.out.println("Take a shot!");
 
-        boolean isAllSank;
+        ShotStatus shotStatus;
         do {
             final int index = getCoordinates().getIndex();
-            final var isHit = fieldOne.isHit(index);
-            fieldOne.setCell(index, isHit ? CellType.HIT : CellType.MISS);
+            shotStatus = fieldOne.shot(index);
             System.out.println(fieldOne.getFoggy());
-
-            final var isSank = isHit && fieldOne.getShip(index).orElseThrow().isSank();
-            isAllSank = isSank && fieldOne.isAllSank();
-
-            System.out.println(isHit ? isSank ? isAllSank ?
-                    "You sank the last ship. You won. Congratulations!" :
-                    "You sank a ship! Specify a new target:" :
-                    "You hit a ship! Try again:" :
-                    "You missed. Try again:");
-
-        } while (!isAllSank);
+            System.out.println(shotStatus);
+        } while (shotStatus != ShotStatus.ALL);
 
         System.out.println("Bye!");
     }

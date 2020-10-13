@@ -1,7 +1,6 @@
 package battleship.domain;
 
 public enum ShotStatus {
-    START("The game starts!"),
     MISS("You missed. Try again:"),
     HIT("You hit a ship! Try again:"),
     SUNK("You sank a ship! Specify a new target:"),
@@ -10,5 +9,10 @@ public enum ShotStatus {
 
     ShotStatus(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return description;
     }
 }
