@@ -1,14 +1,14 @@
 package battleship;
 
 import battleship.domain.BattleField;
-import battleship.domain.Coordinates;
 import battleship.domain.ShipType;
 import battleship.domain.ShotStatus;
+import battleship.services.HumanPlayer;
 import battleship.services.ManualShipArranger;
+import battleship.services.Player;
 import battleship.services.ShipArranger;
 
 import java.util.Scanner;
-import java.util.stream.IntStream;
 
 import static battleship.domain.ShipType.*;
 import static java.util.stream.IntStream.range;
@@ -21,24 +21,34 @@ public class Game implements Runnable {
 
     private BattleField[] fields = new BattleField[2];
     private String[] playerName = new String[]{"Player 1", "Player 2"};
-    private int currentPlayer = 0;
+    private int currentPlayer;
+    private Player[] players;
+
+    public Game() {
+        players = new Player[]{
+                new HumanPlayer("Player1"),
+                new HumanPlayer("Player2")
+        };
+        players[0].setFoe(players[1]);
+        players[1].setFoe(players[0]);
+        currentPlayer = 0;
+    }
 
     @Override
     public void run() {
-        placeShips();
+        currentPlayer().placeShips(SHIPS_SET);
         switchPlayer();
-        placeShips();
+        currentPlayer().placeShips(SHIPS_SET);
         startGame();
     }
 
-    private void placeShips() {
-        System.out.println(playerName[currentPlayer] + ", place your ships on the game field");
-        fields[currentPlayer] = SHIP_ARRANGER.placeShips(SHIPS_SET);
+    private Player currentPlayer() {
+        return players[currentPlayer];
     }
 
     private void switchPlayer() {
         currentPlayer = 1 - currentPlayer;
-        System.out.println("Press Enter and pass the move to " + playerName[currentPlayer]);
+        System.out.println("Press Enter and pass the move to " + currentPlayer());
         scanner.nextLine();
         clearScreen();
     }
@@ -52,27 +62,13 @@ public class Game implements Runnable {
         ShotStatus shotStatus;
         do {
             switchPlayer();
-            System.out.println(fields[1 - currentPlayer].getFoggy());
-            System.out.println("---------------------");
-            System.out.println(fields[currentPlayer]);
-            System.out.println(playerName[currentPlayer] + ", it's your turn:");
-
-            final int index = getCoordinates().getIndex();
-            shotStatus = fields[1 - currentPlayer].shot(index);
+            final int index = currentPlayer().getShotIndex();
+            shotStatus = currentPlayer().getFoe().shot(index);
             System.out.println(shotStatus);
+
         } while (shotStatus != ShotStatus.ALL);
 
-        System.out.println(fields[currentPlayer] + " won the battle!");
-    }
-
-    private Coordinates getCoordinates() {
-        while (true) {
-            final var input = scanner.nextLine().toUpperCase();
-            if (Coordinates.isValid(input)) {
-                return new Coordinates(input);
-            }
-            System.out.println("Error! You entered the wrong coordinates! Try again:");
-        }
+        System.out.println(currentPlayer() + " won the battle!");
     }
 
 }
