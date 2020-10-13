@@ -5,8 +5,10 @@ import battleship.domain.Coordinates;
 import battleship.domain.ShipType;
 import battleship.domain.ShotStatus;
 import battleship.services.ManualShipArranger;
+import battleship.services.ShipArranger;
 
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 import static battleship.domain.ShipType.*;
 
@@ -14,49 +16,50 @@ public class Game implements Runnable {
     private static final Scanner scanner = new Scanner(System.in);
     private static final ShipType[] SHIPS_SET = new ShipType[]
             {AIRCRAFT_CARRIER, BATTLESHIP, SUBMARINE, CRUISER, DESTROYER};
+    private static final ShipArranger SHIP_ARRANGER = new ManualShipArranger();
 
     private BattleField fieldOne;
     private BattleField fieldTwo;
+    private BattleField[] fields = new BattleField[2];
+    private String[] playerName = new String[]{"Player 1", "Player 2"};
+    private int currentPlayer = 0;
 
     @Override
     public void run() {
+        placeShips();
+        switchPlayer();
         placeShips();
         startGame();
     }
 
     private void placeShips() {
-        final var adjuster = new ManualShipArranger();
-
-        System.out.println("Player 1, place your ships on the game field");
-        fieldOne = adjuster.placeShips(SHIPS_SET);
-        switchPlayer();
-        System.out.println("Player 2, place your ships on the game field");
-        fieldTwo = adjuster.placeShips(SHIPS_SET);
-        switchPlayer();
+            System.out.println(playerName[currentPlayer] + ", place your ships on the game field");
+            fields[currentPlayer] = SHIP_ARRANGER.placeShips(SHIPS_SET);
     }
 
     private void switchPlayer() {
-        System.out.println("Press Enter and pass the move to another player");
+        currentPlayer = 1 - currentPlayer;
+        System.out.println("Press Enter and pass the move to " + playerName[currentPlayer]);
         scanner.nextLine();
         // clear screen
     }
 
     private void startGame() {
         System.out.println("The game starts!");
-        System.out.println(fieldTwo.getFoggy());
-        System.out.println("---------------------");
-        System.out.println(fieldOne);
-        System.out.println("Take a shot!");
-
         ShotStatus shotStatus;
         do {
+            switchPlayer();
+            System.out.println(fields[1 - currentPlayer].getFoggy());
+            System.out.println("---------------------");
+            System.out.println(fields[currentPlayer]);
+            System.out.println(playerName[currentPlayer] + ", it's your turn:");
+
             final int index = getCoordinates().getIndex();
-            shotStatus = fieldOne.shot(index);
-            System.out.println(fieldOne.getFoggy());
+            shotStatus = fields[1 - currentPlayer].shot(index);
             System.out.println(shotStatus);
         } while (shotStatus != ShotStatus.ALL);
 
-        System.out.println("Bye!");
+        System.out.println(fields[currentPlayer] + " won the battle!");
     }
 
     private Coordinates getCoordinates() {
